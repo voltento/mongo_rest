@@ -34,7 +34,7 @@ func (s *Server) bind() {
 		func(c *gin.Context) {
 			filters, err := parseFilters(c)
 			if err != nil {
-				c.JSON(http.StatusBadRequest, err)
+				c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 				return
 			}
 			records := s.search.FindRecords(filters)
@@ -44,7 +44,7 @@ func (s *Server) bind() {
 
 	s.router.GET("/health", func(c *gin.Context) {
 		if err := s.hc.Healthy(); err != nil {
-			c.JSON(http.StatusInternalServerError, err)
+			c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 		} else {
 			c.JSON(http.StatusOK, "healthy")
 		}

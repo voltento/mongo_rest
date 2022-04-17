@@ -13,9 +13,8 @@ import (
 )
 
 type Mongo struct {
-	client    *mongo.Client
-	cfg       config.Config
-	healthyCB func(err error)
+	client *mongo.Client
+	cfg    config.Config
 }
 
 func (m *Mongo) HealthCheck() error {
@@ -95,7 +94,8 @@ func (m *Mongo) FindRecords(filters *dto.Filters) []dto.Record {
 
 	c, err := numbers.Find(ctx, conditions, findOptions)
 	if err != nil {
-		log.Errorf("can not perform find requet %v", err.Error())
+		// TODO: handle connection error
+		log.Errorf("can not perform find request %w", err.Error())
 	}
 	defer c.Close(context.TODO())
 
@@ -104,7 +104,8 @@ func (m *Mongo) FindRecords(filters *dto.Filters) []dto.Record {
 		var elem dto.Record
 		err := c.Decode(&elem)
 		if err != nil {
-			log.Errorf("can not parse the record %v", err.Error())
+			log.Errorf("can not parse the record %w", err.Error())
+			continue
 		}
 
 		results = append(results, elem)

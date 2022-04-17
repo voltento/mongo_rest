@@ -23,12 +23,12 @@ func (h *HealthChecker) Healthy() error {
 
 	for _, s := range h.services {
 		h.wg.Add(1)
-		go func() {
+		go func(s HealthCheck) {
 			if err := s.HealthCheck(); err != nil {
 				h.err <- err
 			}
 			defer h.wg.Done()
-		}()
+		}(s)
 	}
 
 	go func() {
